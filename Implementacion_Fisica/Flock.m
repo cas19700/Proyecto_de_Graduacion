@@ -5,6 +5,7 @@ classdef Flock
     
     properties
         boids
+        predator
         lattice_size
         rad_sp
         step_counter=1;
@@ -26,10 +27,11 @@ classdef Flock
     
     methods
         
-        function obj = Flock(boids,lattice_size,pololu,robotat)
+        function obj = Flock(boids,lattice_size,pololu,robotat,predator)
             obj.boids=boids;
+            obj.predator=predator;
             obj.lattice_size=lattice_size;
-            obj.rad_sp=zeros(1,length(boids))
+            obj.rad_sp=zeros(1,length(boids));
             obj.ftimes = 0;
             obj.val_rad = 0;
             obj.pololu = pololu;
@@ -46,8 +48,10 @@ classdef Flock
             obj.simu_time = 150;
             obj.xvals = zeros(1,obj.simu_time)
             obj.yvals = zeros(1,obj.simu_time)
-            obj.xvals(1) = obj.boids(1).position(1); % Generamos el array PROBAR QUITAR ESTO
-            obj.yvals(1) = obj.boids(1).position(2); % Generamos el array
+            obj.xvals(1,1) = obj.boids(1).position(1); % Generamos el array PROBAR QUITAR ESTO
+            obj.yvals(1,1) = obj.boids(1).position(2); % Generamos el array
+            obj.xvals(2,1) = obj.boids(2).position(1); % Generamos el array PROBAR QUITAR ESTO
+            obj.yvals(2,1) = obj.boids(2).position(2); % Generamos el array
             
             
             obj.arr_sp = zeros(length(boids),length(boids))
@@ -130,9 +134,15 @@ classdef Flock
                 
                 %obj.xval(obj.step_counter) = obj.boids(1).position(1);
                 %obj.yval(obj.step_counter) = obj.boids(1).position(2);
-                    
-                obj.xvals(obj.step_counter) = obj.boids(1).position(1);
-                obj.yvals(obj.step_counter) = obj.boids(1).position(2);
+                if obj.step_counter == 3
+                    xp = obj.predator(1).position(1);
+                    yp = obj.predator(1).position(2);
+                    plane.predator_figure_handles(1) = viscircles([xp,yp], 10, 'EdgeColor', 'k', 'LineWidth', 2);
+                    %plot(xp, yp, 'o', 'MarkerSize', 100, 'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'k');
+                end   
+                
+                obj.xvals(i,obj.step_counter) = obj.boids(i).position(1);
+                obj.yvals(i,obj.step_counter) = obj.boids(i).position(2);
                 
                 %obj.xval(obj.step_counter) = cor(1)*100+380/2+10;
                 %obj.yval(obj.step_counter) = cor(2)*100+480/2+10;
@@ -145,9 +155,9 @@ classdef Flock
             if obj.step_counter >= obj.simu_time
                 hold on;
             
-                plot (obj.xval, obj.yval);		
+                %plot (obj.xval(1,:), obj.yval(1,:));		
                 
-                plot (obj.xvals, obj.yvals);
+                plot (obj.xvals(1,:), obj.yvals(1,:));
                 
                 p = obj.xvals(148)
                 
