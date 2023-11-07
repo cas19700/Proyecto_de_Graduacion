@@ -4,6 +4,7 @@ classdef Plane
     
     properties
         boids_figure_handles
+        predator_figure_handles
         plane_handle
         lattice_size
         
@@ -13,7 +14,7 @@ classdef Plane
     end
     
     methods
-        function obj = Plane(plane_handle, lattice_size, boids, robotat)
+        function obj = Plane(plane_handle, lattice_size, boids, robotat, predator)
             obj.plane_handle = plane_handle;
             %             set(p,'xlim',[0 lattice_size(1)]);
             %             set(p,'ylim',[0 lattice_size(2)]);
