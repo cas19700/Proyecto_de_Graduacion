@@ -5,8 +5,8 @@ clear all;
 %tStart = tic;
 
 robot = robotat_connect();
-pol(1) = robotat_3pi_connect(2)
-%pol(2) = robotat_3pi_connect(3) % 
+pol(1) = robotat_3pi_connect(5)
+pol(2) = robotat_3pi_connect(6) % 
 %pol(3) = robotat_3pi_connect(4)
 
 MAX_WHEEL_VELOCITY = 850; % Velocidad máxima ruedas (en rpm) 
@@ -31,39 +31,58 @@ robotat_3pi_force_stop(pol(3))
 
 %% Obtener posiciones de los Pololu
 
-% Pololu #3 CAMBIAR A 3, ESTA EN 6 CAMBIAR ESTE SIEMPRE EN EL FLOCK TAMBIEN
+% Pololu #2 CAMBIAR A 3, ESTA EN 6 CAMBIAR ESTE SIEMPRE EN EL FLOCK TAMBIEN
 pos1 = robotat_get_pose(robot, 2, 'eulxyz') % Obtener la posicion del pololu y angulos
 bearing1 = pos1(6)+136.5751;                 % Ajuste para el angulo de bearing
 bearing1 = deg2rad(bearing1);                % Cambio a radianes
 
-% Pololu #4   CAMBIAR A 4 ESTA EN 8(HOY ESTABAN USANDOLO)
+% Pololu #3   CAMBIAR A 4 ESTA EN 8(HOY ESTABAN USANDOLO)
 pos2 = robotat_get_pose(robot, 3, 'eulxyz') % Obtener la posicion del pololu y angulos
 bearing2 = pos2(6)-179.8062;                 % Ajuste para el angulo de bearing
 bearing2 = deg2rad(bearing2);                % Cambio a radianes
 
-% Pololu #5
+% Pololu #4
 pos3 = robotat_get_pose(robot, 4, 'eulxyz') % Obtener la posicion del pololu y angulos
 bearing3 = pos3(6)-132.0875;                 % Ajuste para el angulo de bearing
 bearing3 = deg2rad(bearing3);                % Cambio a radianes
 
+
+% Pololu #5
+pos4 = robotat_get_pose(robot, 5, 'eulxyz') % Obtener la posicion del pololu y angulos
+bearing4 = pos4(6)-94.1125;                 % Ajuste para el angulo de bearing
+bearing4 = deg2rad(bearing4);                % Cambio a radianes
+
+% Pololu #6
+pos5 = robotat_get_pose(robot, 6, 'eulxyz') % Obtener la posicion del pololu y angulos
+bearing5 = pos5(6)-130.5976;                 % Ajuste para el angulo de bearing
+bearing5 = deg2rad(bearing5);                % Cambio a radianes
 %% Simulación
 boids_count=1; % Numero de pololus a utilizar
 predator_count=1;
 predator=Predator.empty;
 boids=Boid.empty; % Espacios
 predator=Predator(200,200)
-% Pololu #3
+%% Pololu #2
 boids(1) = Boid(pos1(1)*100+380/2,pos1(2)*100+480/2,bearing1,predator) % Envios de posiciones, angulo de bearing y desfases (380/2)
                                                                  % El +10 tambien es para un desfase y hacer 
                                                                  % mas pequeño el mapa                                                          
-%% Pololu #4
+%% Pololu #3
 boids(2) = Boid(pos2(1)*100+380/2,pos2(2)*100+480/2,bearing2,predator) % Envios de posiciones, angulo de bearing y desfases (380/2)
                                                                  % El +10 tambien es para un desfase y hacer 
                                                                  % mas pequeño el mapa
-%% Pololu #5                                                                 
+%% Pololu #4                                                                 
 boids(3) = Boid(pos3(1)*100+380/2,pos3(2)*100+480/2,bearing3,predator) % Envios de posiciones, angulo de bearing y desfases (380/2)
                                                                  % El +10 tambien es para un desfase y hacer 
                                                                  % mas pequeño el mapa                                                                
+%% Pololu #5                                                                 
+boids(1) = Boid(pos4(1)*100+380/2,pos4(2)*100+480/2,bearing4,predator) % Envios de posiciones, angulo de bearing y desfases (380/2)
+%boids(4)                                                                 % El +10 tambien es para un desfase y hacer 
+                                                                 % mas pequeño el mapa                                                                
+%% Pololu #6                                                                 
+boids(2) = Boid(pos5(1)*100+380/2,pos5(2)*100+480/2,bearing5,predator) % Envios de posiciones, angulo de bearing y desfases (380/2)
+%boids(5)                                                                 % El +10 tambien es para un desfase y hacer 
+                                                                 % mas pequeño el mapa                                                                
+                                                                 
 %% Correr la simulación                                                                
 tic
 %pol = pol
@@ -95,7 +114,7 @@ eO_1 = 0;
 %alpha = 0.9;
 v0 = 0.5;
 alpha = 0.7;
-nval = 1;
+nval = [1,1];
 % Arreglos para generar los espacios de memoria
 cor = zeros(1,2);
 xf = zeros(1,2);
@@ -104,10 +123,10 @@ xf(1,1) = pos1(1)*100+380/2; % Ajustamos el eje x para hacer que concuerde con l
 yf(1,1) = pos1(2)*100+480/2;
 wctrl = flocksim.arr_sp;
 vctrl = boids.max_speed;
-% Puntos a alcanzar
+% Puntos a alcanzar de varios pololu
 xgoal = flocksim.xvals 
 ygoal = flocksim.yvals
-% Suavizado
+%% Suavizado del primer Pololu
 cpts = [xgoal(1,:);ygoal(1,:)]
 tpts = [0 25];
 tvect = 0:5:25
@@ -122,21 +141,39 @@ plot(q(1,:), q(2,:)) % Se grafican los nuevos valores
 xlabel('X')
 ylabel('Y')
 hold off
+%% Suavizado del segundo Pololu
+
+cpts2 = [xgoal(2,:);ygoal(2,:)]
+tpts2 = [0 25];
+tvect2 = 0:5:25
+%tpts = [0 150];
+%tvect = 0:1:150
+
+[q2, qd2, qdd2, pp2] = bsplinepolytraj(cpts2,tpts2,tvect2); % Se obtienen valores mas suavizados
+figure
+plot(cpts2(1,:),cpts2(2,:),'xb-') % Se grafican los valores originales
+hold all
+plot(q2(1,:), q2(2,:)) % Se grafican los nuevos valores
+xlabel('X')
+ylabel('Y')
+hold off
 %%
+q = [q;q2];
 reff=0
-bear_m = [0,136.5751,-179.8062,-132.0875] % angulos de bearing obtenidos anteriormente
-tam1 = length(q);
+bear_m = [0,136.5751,-179.8062,-132.0875,-94.1125,-130.5976] % angulos de bearing obtenidos anteriormente
+tam1 = [length(q),length(q2)];
 k=1;
 detener = zeros(1,length(boids_count));
         while(1)%for k=1:tam1    
-            for i=1:1 %boids_count
-                roba = robotat_get_pose(robot, 2, 'eulxyz'); % i + 1, Obtener la posicion actual
-                bearing = roba(6)+bear_m(2); % Ajustar el angulo de bearing
+            for i=1:2 %boids_count
+                roba = robotat_get_pose(robot, 4+i, 'eulxyz'); % i + 1, Obtener la posicion actual
+                bearing = roba(6)+bear_m(4+i); % Ajustar el angulo de bearing
                 bearing = deg2rad(bearing); % Grados a radianes
                 x = roba(1)*100+380/2; % Ajustamos el eje x para hacer que concuerde con la plataforma
                 y = roba(2)*100+480/2; % Ajustamos el eje y para hacer que concuerde con la plataforma
                 theta = bearing;   % theta igual al angulo de bearing
-                ref = [q(1,nval); q(2,nval)]; % Referencia igual a los valores obtenidos anteriormente
+                %ref = [q(1,nval); q(2,nval)]; % Referencia igual a los valores obtenidos anteriormente
+                ref = [q(i*2-1,nval(i)); q(i*2,nval(i))]; % Referencia igual a los valores obtenidos anteriormente
                 e = [ref(1) - x; ref(2) - y]; % Calculo del error
                 thetag = atan2(e(2), e(1)); % Diferencia enter angulo deseado
                 av =  [x; y]; % Actual Value
@@ -171,19 +208,20 @@ detener = zeros(1,length(boids_count));
                    if (abs(yv)<=7)
                        reff(2,k) = yv 
                        reff(4,k) = abs(yv)
-                       nval = nval+1 % Aumentar el contador
-                       pose = robotat_get_pose(robot, 2, 'eulxyz');
-                       xf(nval) = pose(1)*100+380/2; % Guardar valores de x
-                       yf(nval) = pose(2)*100+480/2; % Guardar valores de y
+                       nval(i) = nval(i)+1 % Aumentar el contador
+                       
+                       pose = robotat_get_pose(robot, 4+i, 'eulxyz');
+                       xf(i,nval(i)) = pose(1)*100+380/2; % Guardar valores de x
+                       yf(i,nval(i)) = pose(2)*100+480/2; % Guardar valores de y
                        
                    end
                        
-                       if (nval > tam1)
-                           nval = tam1;
+                       if (nval(i) > tam1(i))
+                           nval(i) = tam1(i);
                            robotat_3pi_force_stop(pol(i)) % Si llega al ultimo valor detenerse
                            %detener(1,i) = 1;
                            detener = 1;
-                           break;
+                           continue;
                        end
                 end
                 
@@ -225,7 +263,7 @@ detener = zeros(1,length(boids_count));
         
         
 robotat_3pi_force_stop(pol(1)) % Detiene al pololu 3
-%robotat_3pi_force_stop(pol(2)) % Detiene al pololu 4
+robotat_3pi_force_stop(pol(2)) % Detiene al pololu 4
 %robotat_3pi_force_stop(pol(3)) % Detiene al pololu 4
 % bsplinepolytraj
 %% Gráficas
