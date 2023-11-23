@@ -1,6 +1,6 @@
 %% Simulación de Boids de Reynolds
 % Compu path: C:\Users\Brayan\OneDrive - MABREX CENTROAMERICA S.A\Documentos\Año 2023\Segundo semestre\Tesis\PruebasFisicas
-%% Implementación Física variables
+%% Variables Implementación Física 
 clear all;
 %tStart = tic;
 
@@ -20,7 +20,7 @@ WHEEL_RADIUS = (32/2)/1000; % Radio de las ruedas (en m)
 DISTANCE_FROM_CENTER = (94/2)/1000; % Distancia a ruedas (en cm)
 MAX_SPEED = WHEEL_RADIUS * MAX_WHEEL_VELOCITY;% Velocidad lineal máxima (en cm/s)
 
-%% Pruebas Pol4
+%% Pruebas Robots Pololu 3pi+
 % Usado para comprobar que los Pololu funcionen adecuadamente
 robotat_3pi_set_wheel_velocities(pol(1),100,-100)
 robotat_3pi_force_stop(pol(1))
@@ -79,7 +79,9 @@ predator_count=1;
 predator=Predator.empty;
 boids=Boid.empty; % Espacios
 predator=Predator(230,250)
-%% Pololu #2
+
+%% Ajuste de plano
+% Pololu #2
 boids(1) = Boid(pos1(1)*100+340/2,pos1(2)*100+440/2,bearing1,predator) % Envios de posiciones, angulo de bearing y desfases (340/2)
                                                                  % El +10 tambien es para un desfase y hacer 
                                                                  % mas pequeño el mapa                                                          
@@ -112,7 +114,7 @@ boids(7) = Boid(pos7(1)*100+340/2,pos7(2)*100+440/2,bearing7,predator) % Envios 
 boids(8) = Boid(pos8(1)*100+340/2,pos8(2)*100+440/2,bearing8,predator) % Envios de posiciones, angulo de bearing y desfases (340/2)
 %boids(5)                                                                 % El +10 tambien es para un desfase y hacer 
                                                                  % mas pequeño el mapa                                                                
-%% Correr la simulación                                                                
+%% Ejecutar simulación                                                                
 tic
 %pol = pol
 flock=Flock(boids,[340 440], pol,robot,predator);% Se cargan las dimensiones de los bordes del programa (x=340, y=440)
@@ -121,7 +123,7 @@ fprintf('Tiempos:'); % Esto tampoco
 f = figure;
 plane = Plane(f,[340 440],boids,robot,predator) % Se visualiza la simulación
 flocksim = flock.run(plane);   % Se empiezan a correr los renderizados
-%% Controlador y Envio de datos
+%% Controlador e inicialización de registro de datos
 % PID orientación
 kpO = 2*5;
 kiO = 0.0001; 
@@ -160,14 +162,12 @@ yf(7,1) = pos7(2)*100+440/2;
 
 xf(8,1) = pos8(1)*100+340/2; % Ajustamos el eje x para hacer que concuerde con la plataforma
 yf(8,1) = pos8(2)*100+440/2;
-%%
-wctrl = flocksim.arr_sp;
-vctrl = boids.max_speed;
-% Puntos a alcanzar de varios pololu
+%% Puntos a alcanzar 
 xgoal = flocksim.xvals; 
 ygoal = flocksim.yvals;
 q = 0;
-%% Suavizado del primer Pololu
+%% Suavizados (Interpolación)
+% Suavizado del primer Pololu
 cpts = [xgoal(1,:);ygoal(1,:)]
 tpts = [0 25];
 tvect = 0:5:25
@@ -307,15 +307,7 @@ xlabel('X')
 ylabel('Y')
 hold off
 grid on
-%% GRAFICAR PUNTO
-hold on
-% Especifica las coordenadas del punto que deseas dibujar
-x_punto = 359;
-y_punto = 367.93;
-% Dibuja el punto en las coordenadas especificadas
-scatter(x_punto, y_punto, 10, 'r', 'filled'); % 'r' especifica el color rojo y 'filled' rellena el punto
-
-%%
+%% Envío y recepción de datos
 q = [q;q2;q3;q4;q5];
 %q = [q];
 reff=0
@@ -436,7 +428,6 @@ figure(18)
 q1xf = q(1,1:6)
 q1yf = q(2,1:6)
 plot(q1xf, q1yf) % Valores de la simulacion interpolados
-%axis([min(flocksim.xvals), max(flocksim.xvals), min(flocksim.yvals), max(flocksim.yvals)]);
 hold on;
 xf1 = xf(1,2:7)
 yf1 = yf(1,2:7)
