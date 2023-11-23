@@ -45,14 +45,26 @@ classdef Flock
             
             %obj.xvals = [obj.boids(1).position(1)]; % Generamos el array
             %obj.yvals = [obj.boids(1).position(2)]; % Generamos el array
-            obj.simu_time = 150;
+            obj.simu_time = 500; % TIEMPO DE SIMULACION
             obj.xvals = zeros(1,obj.simu_time)
             obj.yvals = zeros(1,obj.simu_time)
             obj.xvals(1,1) = obj.boids(1).position(1); % Generamos el array PROBAR QUITAR ESTO
             obj.yvals(1,1) = obj.boids(1).position(2); % Generamos el array
             obj.xvals(2,1) = obj.boids(2).position(1); % Generamos el array PROBAR QUITAR ESTO
             obj.yvals(2,1) = obj.boids(2).position(2); % Generamos el array
-            
+            obj.xvals(3,1) = obj.boids(3).position(1); % Generamos el array PROBAR QUITAR ESTO
+            obj.yvals(3,1) = obj.boids(3).position(2); % Generamos el array
+            obj.xvals(4,1) = obj.boids(4).position(1); % Generamos el array PROBAR QUITAR ESTO
+            obj.yvals(4,1) = obj.boids(4).position(2); % Generamos el array
+            obj.xvals(5,1) = obj.boids(5).position(1); % Generamos el array PROBAR QUITAR ESTO
+            obj.yvals(5,1) = obj.boids(5).position(2); % Generamos el array
+%             obj.xvals(6,1) = obj.boids(6).position(1); % Generamos el array PROBAR QUITAR ESTO
+%             obj.yvals(6,1) = obj.boids(6).position(2); % Generamos el array
+%             obj.xvals(7,1) = obj.boids(7).position(1); % Generamos el array PROBAR QUITAR ESTO
+%             obj.yvals(7,1) = obj.boids(7).position(2); % Generamos el array
+%             obj.xvals(8,1) = obj.boids(8).position(1); % Generamos el array PROBAR QUITAR ESTO
+%             obj.yvals(8,1) = obj.boids(8).position(2); % Generamos el array
+%             
             
             obj.arr_sp = zeros(length(boids),length(boids))
             %cor = robotat_get_pose(obj.robotat, 8, 'eulxyz');
@@ -137,7 +149,7 @@ classdef Flock
                 if obj.step_counter == 3
                     xp = obj.predator(1).position(1);
                     yp = obj.predator(1).position(2);
-                    plane.predator_figure_handles(1) = viscircles([xp,yp], 10, 'EdgeColor', 'k', 'LineWidth', 2);
+                    plane.predator_figure_handles(1) = viscircles([xp,yp], 50, 'EdgeColor', 'k', 'LineWidth', 2);
                     %plot(xp, yp, 'o', 'MarkerSize', 100, 'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'k');
                 end   
                 
@@ -157,8 +169,8 @@ classdef Flock
             
                 %plot (obj.xval(1,:), obj.yval(1,:));		
                 
-                plot (obj.xvals(1,:), obj.yvals(1,:));
-                
+                plot (obj.xvals(1,:), obj.yvals(1,:)); %ESTE ES EL ORIGINAL
+                %plot (obj.xvals(2,:), obj.yvals(2,:));
                 p = obj.xvals(148)
                 
                 %obj.yvals = obj.yvals

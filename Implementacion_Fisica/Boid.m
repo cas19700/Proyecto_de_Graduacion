@@ -224,7 +224,7 @@ classdef Boid
             b = p - a;
             
 
-            if (norm(b)<100) && (norm(p)<norm(v)) % Si b es menor al radio de 100 del depredador y magnitud de p < v
+            if (norm(b)<50) % Si b es menor al radio de 100 del depredador y magnitud de p < v
 
               w = (R * a')';
               wx = w(1);
